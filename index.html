@@ -19,6 +19,7 @@ button:disabled{opacity:.55}
   <div class="crab">&#x1F980;</div>
   <h1>You're invited to a meetup</h1>
   <p>A friend is using CrabPi to pick a spot that's fair for everyone. Share your location <b>once</b> so it can find somewhere in the middle.</p>
+  <p class="small" id="forwho"></p>
   <button id="go">&#x1F4CD; Share my location</button>
   <div id="msg"></div>
   <p class="small">Your location is encrypted on your phone so only your friend's CrabPi can read it.
@@ -29,8 +30,14 @@ const TOPIC = "crabpi-in-ky9ffarrhpaf24en";            // filled in by CrabPi
 const KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr/HEDEwL8EUgSn42ManlZVYi+7d/U2ZFwnt6GtWlnlBc8u5JkwVda6yvLMXdTWodczlX81A58IgeWwg8y3YrL6nOKS2A2NYpHjF6mafsyFVe5cx76YaHwHHGKxbHdqbGt/HliTppkEYOb19uj2jSMBIzcWRMC5qJsuZXGHwoDPJ23ECm/5reQJjjq9++VhB/1J4MJNMhEwFFNQHLBnDF1dxmvGtuOPHCaSSapngQT1aswnaIOGP+TGKgoVF5zz3GjSeMHWjYsVh+BmlBOy69CR48blKbyAV5W0WVaJy7bT6pTg7xwZXVUPVZPsGJSVaadfXq3x0VFz2qCurEyeFjkwIDAQAB";         // CrabPi's public key (encrypt-only)
 const NTFY = "https://ntfy.sh/";
 const $ = s => document.querySelector(s);
-const id = new URLSearchParams(location.hash.slice(1)).get("i");
+const params = new URLSearchParams(location.hash.slice(1));
+const id = params.get("i");
+const who = (params.get("n") || "").slice(0, 20);
 function say(text, cls) { $("#msg").textContent = text; $("#msg").className = cls || ""; }
+if (who) {
+  $("h1").textContent = who + ", you're invited to a meetup";
+  $("#forwho").textContent = "This invite is just for " + who + ". If you're not " + who + ", please don't tap it.";
+}
 if (!id || !/^[A-Za-z0-9_-]{4,40}$/.test(id)) { $("#go").disabled = true; say("This invite link looks incomplete. Ask your friend to resend it.", "err"); }
 
 async function encrypt(obj) {
